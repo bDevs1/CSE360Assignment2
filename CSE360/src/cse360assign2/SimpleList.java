@@ -271,5 +271,91 @@ public class SimpleList
 		
 		return location;
 	}
+	
+	/**
+	 * The parameter is a new integer that will be added to the end
+	 * of "list". If "list" is not large enough to hold the elements
+	 * (i.e. count+1 > list.length), then "list" is increased by 50%
+	 * 
+	 * @param element
+	 */
+	public void append(int element)
+	{
+		//Check to see if the array is full
+		if(count == list.length)
+		{
+			//The array's new size is 50% larger
+			int newSize = (int)(1.5 * list.length);
+			//Create a new array temp of the same size as list currently
+			int[] temp = new int[list.length];
+			
+			//Copy all elements from the array into temp
+			//Since indexing begins at 0, we end at list.length - 1
+			for(int index = 0; index < list.length; index++)
+			{
+				temp[index] = list[index];
+			}
+			
+			list = new int[newSize];
+			
+			//Copy the elements in temp back to list at one position 
+			//further than they were previously to make room for the
+			//new element
+			for(int index = 0; index < temp.length; index++)
+			{
+				list[index] = temp[index];
+			}
+			
+		}
+		
+		//Add the new element to the end of list regardless of whether
+		//its size was increased or not; increment count
+		list[count] = element;
+		count++;
+		
+	}
+	
+	/**
+	 * If there are no elements in "list", negative one is returned
+	 * Otherwise, the first element is returned
+	 * @return the first element in "list"
+	 */
+	
+	public int first()
+	{
+		if(count == 0)
+			return -1;
+		else 
+			return list[0];
+	}
 
+	/**
+	 * If there are no elements in "list", negative one is returned
+	 * Otherwise, the last element is returned
+	 * @return the last element in "list"
+	 */
+	public int last()
+	{
+		if(count == 0)
+			return -1;
+		else
+			/*
+			 * Indexing of arrays in Java begins at 0
+			 * Therefore, the index of the last element in the array
+			 * is located at count minus 1 rather than count itself
+			 */
+			return list[count - 1];
+	}
+
+	/**
+	 * The current number of possible locations in list is
+	 * equivalent to the length of "list" rather than the value
+	 * of count. 
+	 * @return the length of "list"
+	 */
+	public int size()
+	{
+		return list.length;
+	}
+	
 }
