@@ -4,10 +4,13 @@
  * Assignment #2
  * The purpose of this class is to create a ten element array that can be
  * manipulated in the following ways: a number can be added to the 
- * beginning, all occurrences of a number can be removed from the array, 
- * the array can be searched to find the FIRST occurrence of an element,
- * the array can be printed as a string, and the number of elements in the
- * array can be seen.
+ * beginning (and the list size will increase by 50% if there is not 
+ * enough room to add another element), the first occurrence of a number
+ * can be removed from the array (and the list size will be decreased by
+ * 25% if the list is at least 25% empty after the element is removed),
+ * the array can be searched to find the FIRST occurrence of an element, 
+ * the array can be printed as a string, and the number of elements in 
+ * the array can be seen.
  */
 
 package cse360assign2;
@@ -19,7 +22,7 @@ public class SimpleList
 	 * It will be initialized in the constructor below 
 	 * An integer called "count" is declared
 	 * This will keep track of the number of elements added and removed from
-	 * the array, but it can never exceed 10 
+	 * the array.
 	 */
 	public int[] list;
 	public int count;
@@ -38,34 +41,66 @@ public class SimpleList
 	
 	/**
 	 * Adds the parameter to the beginning of "list"
-	 * All elements in the list beforehand are shifted to the right by one 
-	 * Count is incremented by one unless the condition below is met:
-	 * If there are already ten elements in the array, the last one is
-	 * "deleted" and count remains at 10.
+	 * All elements in the list beforehand are shifted to the right by one. 
+	 * Count is incremented by one. 
+	 * If there is not enough room to add another element to the array, 
+	 * the array's size is increased by 50%.
 	 * 
 	 * @param 	newElement 	the new integer that will be added to 
 	 * 						the front of the array
 	 */
 	public void add(int newElement)
 	{
-		/*
-		 * The for loop shifts all elements by setting the one at "index"
-		 * to the value of the element before it (at "index - 1"). 
-		 * The loop ends at list.length-1 to avoid out-of-bounds exceptions
-		 */
-		for(int index = list.length - 1; index > 0; index--)
+		//Check to see if the array is full
+		if(count == list.length)
 		{
-			list[index] = list[index - 1]; 
-		} 
-		
-		//The parameter/new number is set to the beginning of the array
-		list[0] = newElement;
-		
-		//Checking to see if there are already 10 elements in "list"
-		if(count == 10)
-			count = 10;
+			//The array's new size is 50% larger
+			int newSize = (int)(1.5 * list.length);
+			//Create a new array temp of the same size as list currently
+			int[] temp = new int[list.length];
+			
+			//Copy all elements from the array into temp
+			//Since indexing begins at 0, we end at list.length - 1
+			for(int index = 0; index < list.length; index++)
+			{
+				temp[index] = list[index];
+			}
+			
+			list = new int[newSize];
+			
+			//Copy the elements in temp back to list at one position 
+			//further than they were previously to make room for the
+			//new element
+			for(int index = 0; index < temp.length; index++)
+			{
+				list[index + 1] = temp[index];
+			}
+			
+			//Add the new element (method parameter)
+			list[0] = newElement;
+			
+		}
 		else
-			count++;
+		{
+			/*
+			 * The for loop shifts all elements by setting the one at "index"
+			 * to the value of the element before it (at "index - 1"). 
+			 * The loop ends at list.length-1 to avoid out-of-bounds exceptions
+			 */
+			for(int index = list.length - 1; index > 0; index--)
+			{
+				list[index] = list[index - 1]; 
+			} 
+			
+			//The parameter/new number is set to the beginning of the array
+			list[0] = newElement;
+			
+		}
+		
+		
+		//Increment count
+		count++;
+		
 	}
 	
 	/**
@@ -74,6 +109,8 @@ public class SimpleList
 	 * to the left. 
 	 * Count is decremented by one
 	 * If the element is not in the list, none of the above steps occur
+	 * If "list" is at least 25% empty after an element has been 
+	 * removed, then its size will be reduced by 25%
 	 * 
 	 * @param	removeThis	the first occurrence of this element in the array
 	 * 						will be removed
@@ -119,6 +156,57 @@ public class SimpleList
 			
 			count--;
 		}
+		
+		/*
+		 * The values of length and count need to be cast to
+		 * doubles in order to calculate and compare the value
+		 * to 0.25 (25%). However, the list will decrease in 
+		 * size by an integer value.
+		 */
+		double percentEmpty = ( ((double)(list.length) - (double)(count)
+								) / (double)(list.length) );
+		
+		
+		//"list" cannot be reduced to less than one entry
+		if(list.length == 1)
+		{
+			
+		}
+		
+		/*
+		 * Check to see if the list is 25% empty by comparing the 
+		 * number of empty spaces to list.length (the total number
+		 * of spaces). It is calculated above by percentEmpty
+		 */
+		//else if( ((list.length - count)/list.length) >= 0.25)
+		else if(percentEmpty >= 0.25)
+		{
+			/*
+			 * list will be resized as an array that is 25% smaller
+			 * Since integer division is used, the ceiling of 75%
+			 * of the original array is required to reduce the array
+			 * the correct number of elements
+			 * i.e. 7/10 --> 7/8
+			 */
+			int newSize = (int)(Math.ceil(0.75 * list.length));
+			
+			//temp will save the values inside of list
+			int[] temp = new int[list.length];
+			
+			for(int index = 0; index < list.length; index++)
+			{
+				temp[index] = list[index];
+			}
+			
+			list = new int[newSize];
+			
+			//Copy the elements from temp back into list
+			for(int index = 0; index < list.length; index++)
+			{
+				list[index] = temp[index];
+			}
+			
+		}
 
 	}
 	
@@ -157,7 +245,7 @@ public class SimpleList
 	
 	/**
 	 * The parameter searchFor is an integer that this method will look for
-	 * in the 10 element array (list). 
+	 * in the array (list). 
 	 * If the element being looked for is found, its index will be returned.
 	 * Otherwise, -1 will be returned. 
 	 * In the event that there are multiple occurrences of the same number,
